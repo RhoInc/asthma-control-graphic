@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta
+            http-equiv = 'Content-Type'
+            content = 'text/html; charset = utf-8'>
+        <title>ICAC - Control Level by Visit</title>
+
+        <script type = 'text/javascript'
+            src = 'https://d3js.org/d3.v3.min.js'></script>
+        <script type = 'text/javascript'
+            src = 'https://graphics.rhoworld.com/src/webcharts/webcharts.v1.6.1.js'></script>
+        <script type = 'text/javascript'
+            src = 'interactiveSankey_customized.js'></script>
+
+        <link type = 'text/css'
+            rel = 'stylesheet'
+            href = 'https://graphics.rhoworld.com/src/webcharts/webcharts.v1.6.1.css'>
+
+        <style>
+            div.summary{
+                padding-bottom:.5em;
+
+            }
+            div.summary p {
+                font-size:0.8em;
+                padding-bottom:.5em;
+            }
+            #PROSE ul.legend{
+                display:none !important;
+            }
+            #ICATA ul.legend{
+                display:none !important;
+            }
+            
+            * {
+                padding: 0;
+                margin: 0;
+                font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+            }
+
+            body > * {
+                margin:10px;
+            }
+            #title {
+                border-bottom: 1px solid lightgray;
+                font-weight: lighter;
+                font-size: 250%;
+                padding:0;
+            }
+
+            h3{
+                font-weight: lighter;
+            }
+            #PROSE{
+                width:700px;
+            }
+            .chart {
+                padding-left: 1em;
+                padding-bottom:0.2em;
+                width:1200px;
+            }
+
+            .chart .header {
+                font-size: 150%;
+                font-weight: bold;
+            }
+
+            #PROSE ul.legend *{
+                font-size:15pt;
+            }
+
+            g.x.axis text.axis-title{
+                 display:none; 
+            }
+
+            .hidden{
+                display:none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1 id = 'title'>ICAC - Control Level by Visit</h1>
+
+        <div class="summary">
+        <h3>Summary</h3>
+        <p>This interactive figure lets users explore the data presented in Figure 1 from <i>A computerized decision support tool to implement asthma guidelines for children and adolescents is effective in gaining and maintaining asthma control</i> by Sorkness et al published in **Journal info here**. The initial view of the figure shows the proportion and number of study participants who were determined to be at Control Level 1 (well controlled) through Control Level 4 (poorly controlled) at screening visit, randomization, first and last post-randomization visits for each clinical trial. Users can use the controls at the top of the page to change the outcome of interest and to filter the figures to only participants receiving active treatment or placebo.</p>
+        <p>Users can also click any bar segment to overlay a flow diagram showing how participants arrived at that point, and where they go afterward. For example, clicking on the top segment in the rightmost bar shows that participants that moved to CL 1 came equally from CL 1 to 4 at Screening, with the exception of PROSE. </p> 
+        </div>
+        <h3>Interactive Figure</h3>
+        <div class="controls"></div>
+        <div class = 'chart' id = 'ACE'>
+            <div class = 'header'>ACE</div>
+            <div class = 'content'></div>
+        </div>
+        <div class = 'chart' id = 'ICATA'>
+            <div class = 'header'>ICATA</div>
+            <div class = 'content'></div>
+        </div>
+        <div class = 'chart' id = 'PROSE'>
+            <div class = 'header'>PROSE</div>
+            <div class = 'content'></div>
+        </div>
+
+    </body>
+
+    <script>
+        var settings =
+            {
+             id_col: 'recruitid'
+            ,node_col: 'event'
+            ,link_col: 'Control Level'
+            ,height:300
+            ,width:1200
+
+            ,y: { 
+                type: 'linear',
+                domain:[0,600] 
+            }
+            ,resizable:false
+            ,margin:{bottom:30}
+            ,colors:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
+            ,color_dom:["0","1","2","3","4","5","6"]
+            ,legend:{
+                location:"top",
+                label:"Control Level",
+                order:["0","1","2","3","4","5","6"]
+            }
+        };
+        var proseSettings =
+            {id_col: 'recruitid'
+            ,node_col: 'event'
+            ,link_col: 'Control Level'
+            ,y: { 
+                type: 'linear',
+                domain:[0,600] 
+            }
+            ,height:300
+            ,width:626
+            ,resizable:false
+            ,colors:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
+            ,color_dom:["0","1","2","3","4","5","6"]
+            ,margin:{
+                bottom:30
+            }
+        };
+
+        function drawCharts(raw, trt, outcome){
+            if(trt=="Placebo"){
+                settings.y.domain[1]=300
+                proseSettings.y.domain[1]=300
+            }else if(trt=="Active Treatment"){
+                settings.y.domain[1]=450
+                proseSettings.y.domain[1]=450
+            }else{
+                settings.y.domain[1]=600
+                proseSettings.y.domain[1]=600
+            }
+            settings.link_col = outcome;
+            settings.legend.label = outcome;
+            proseSettings.link_col = outcome;
+
+            d3.selectAll(".chart").select(".content").selectAll("*").remove()
+
+            var sub = raw.filter(function(d){
+                if(trt=="All"){
+                    return true
+                }else if (trt=="Placebo"){
+                    return d.groupfix==0
+                }else if(trt=="Active Treatment"){
+                    return d.groupfix==1
+                }
+            })
+
+            //Draw the charts
+            interactiveSankey('#ICATA .content', settings).init(sub.filter(d => d.study === 'ICATA'));
+            interactiveSankey('#ACE .content', settings).init(sub.filter(d => d.study === 'ACE'));
+            interactiveSankey('#PROSE .content', proseSettings).init(sub.filter(d => d.study === 'PROSE'));
+
+            //Update the Titles
+
+        }
+
+        d3.csv('anly_deidentified.csv', function(data) {
+            // Only load 4 primary time points 
+            var sub = data.filter(function(d){return d["event"]!="Other"})
+
+            //draw the initial charts using control level
+            drawCharts(sub, "All","Control Level")
+
+            //set up control for other outcomes
+            var cols = ["Control Level","Treatment Step", "Control Level - Day Symptoms","Control Level - Night Symptoms","Control Level - Pulmonary Function"]
+            d3.select(".controls").append("span").text("Choose Outcome: ")
+            var colSelect = d3.select(".controls").append("select").attr("class","outcome")
+            colSelect.selectAll("option").data(cols).enter().append("option").text(function(d){return d})
+            colSelect.on('change',function(d){
+                var trt = d3.select("select.treatment").property("value")
+                console.log(trt)
+                drawCharts(sub, trt, this.value)
+            })
+
+            //custom filter for treatment arm
+            d3.select(".controls").append("br")
+            d3.select(".controls").append("span").text("Choose Treatment Arm(s): ")
+            var treatments = ["All","Placebo","Active Treatment"]
+            var trtSelect = d3.select(".controls").append("select").attr("class","treatment")
+            trtSelect.selectAll("option").data(treatments).enter().append("option").text(function(d){return d})
+            trtSelect.on('change',function(d){
+                var outcome = d3.select("select.outcome").property("value")
+                console.log(outcome)
+                drawCharts(sub, this.value, outcome)
+            })
+
+
+        });
+    </script>
+</html>
