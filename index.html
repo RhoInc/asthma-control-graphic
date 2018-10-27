@@ -202,7 +202,6 @@
             colSelect.selectAll("option").data(cols).enter().append("option").text(function(d){return d})
             colSelect.on('change',function(d){
                 var trt = d3.select("select.treatment").property("value")
-                console.log(trt)
                 drawCharts(sub, trt, this.value)
             })
 
@@ -214,7 +213,6 @@
             trtSelect.selectAll("option").data(treatments).enter().append("option").text(function(d){return d})
             trtSelect.on('change',function(d){
                 var outcome = d3.select("select.outcome").property("value")
-                console.log(outcome)
                 drawCharts(sub, this.value, outcome)
             })
         });

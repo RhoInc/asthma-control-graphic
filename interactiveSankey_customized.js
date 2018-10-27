@@ -42,7 +42,6 @@ var interactiveSankey = function (webcharts) {
     }
 
     function onPreprocess() {
-      console.log(this.config.color_dom_cl)
         var context = this;
         if(this.config.color_by=="Treatment Step"){
           this.config.colors =this.config.colors_trt
