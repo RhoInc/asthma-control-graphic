@@ -32,7 +32,7 @@
             #ICATA ul.legend{
                 display:none !important;
             }
-            
+
             * {
                 padding: 0;
                 margin: 0;
@@ -71,7 +71,7 @@
             }
 
             g.x.axis text.axis-title{
-                 display:none; 
+                 display:none;
             }
 
             .hidden{
@@ -86,7 +86,7 @@
         <div class="summary">
         <h3>Summary</h3>
         <p>This interactive figure lets users explore the data presented in Figure 1 from <i>A computerized decision support tool to implement asthma guidelines for children and adolescents is effective in gaining and maintaining asthma control</i> by Sorkness et al published in **Journal info here**. The initial view of the figure shows the proportion and number of study participants who were determined to be at Control Level 1 (well controlled) through Control Level 4 (poorly controlled) at screening visit, randomization, first and last post-randomization visits for each clinical trial. Users can use the controls at the top of the page to change the outcome of interest and to filter the figures to only participants receiving active treatment or placebo.</p>
-        <p>Users can also click any bar segment to overlay a flow diagram showing how participants arrived at that point, and where they go afterward. For example, clicking on the top segment in the rightmost bar shows that participants that moved to CL 1 came equally from CL 1 to 4 at Screening, with the exception of PROSE. </p> 
+        <p>Users can also click any bar segment to overlay a flow diagram showing how participants arrived at that point, and where they go afterward. For example, clicking on the top segment in the rightmost bar shows that participants that moved to CL 1 came equally from CL 1 to 4 at Screening, with the exception of PROSE. </p>
         <p>The source code for this figure is available on <a href="https://github.com/RhoInc/asthma-control-graphic">github</a></p>
         </div>
         <h3>Interactive Figure</h3>
@@ -115,14 +115,16 @@
             ,height:300
             ,width:1200
 
-            ,y: { 
+            ,y: {
                 type: 'linear',
-                domain:[0,600] 
+                domain:[0,600]
             }
             ,resizable:false
             ,margin:{bottom:30}
-            ,colors:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
-            ,color_dom:["0","1","2","3","4","5","6"]
+            ,colors_trt:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
+            ,colors_cl:['#e66101','#fdb863','#b2abd2','#5e3c99'].reverse()
+            ,color_dom_trt:["0","1","2","3","4","5","6"]
+            ,color_dom_cl:["1","2","3","4"]
             ,legend:{
                 location:"top",
                 label:"Control Level",
@@ -133,14 +135,17 @@
             {id_col: 'recruitid'
             ,node_col: 'event'
             ,link_col: 'Control Level'
-            ,y: { 
+            ,y: {
                 type: 'linear',
-                domain:[0,600] 
+                domain:[0,600]
             }
             ,height:300
             ,width:626
             ,resizable:false
-            ,colors:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
+            ,colors_trt:['#d73027','#fc8d59','#fee090','#ffffbf','#e0f3f8','#91bfdb','#4575b4'].reverse()
+            ,colors_cl:['#e66101','#fdb863','#b2abd2','#5e3c99'].reverse()
+            ,color_dom_trt:["0","1","2","3","4","5","6"]
+            ,color_dom_cl:["1","2","3","4"]
             ,color_dom:["0","1","2","3","4","5","6"]
             ,margin:{
                 bottom:30
@@ -184,7 +189,7 @@
         }
 
         d3.csv('anly_deidentified.csv', function(data) {
-            // Only load 4 primary time points 
+            // Only load 4 primary time points
             var sub = data.filter(function(d){return d["event"]!="Other"})
 
             //draw the initial charts using control level
@@ -212,8 +217,6 @@
                 console.log(outcome)
                 drawCharts(sub, this.value, outcome)
             })
-
-
         });
     </script>
 </html>

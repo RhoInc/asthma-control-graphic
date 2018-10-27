@@ -41,8 +41,16 @@ var interactiveSankey = function (webcharts) {
         var context = this;
     }
 
-    function onDraw() {
+    function onPreprocess() {
+      console.log(this.config.color_dom_cl)
         var context = this;
+        if(this.config.color_by=="Treatment Step"){
+          this.config.colors =this.config.colors_trt
+          this.config.color_dom=this.config.color_dom_trt
+        }else{
+          this.config.colors =this.config.colors_cl
+          this.config.color_dom=this.config.color_dom_cl
+        }
     }
 
     function drawLinks(chartObject, bars1, bars2, linkClass) {
@@ -149,7 +157,7 @@ var interactiveSankey = function (webcharts) {
             var split1 = d[0].split1;
             var split2 = d[0].split2;
             var IDs = d[0].IDs;
-            return n + ' ' + "participant" + (n > 1 ? 's ' : ' ') + (split1 === split2 ? 'remained at ' + split1 : 'progressed from ' + split1 + ' to ' + split2) 
+            return n + ' ' + "participant" + (n > 1 ? 's ' : ' ') + (split1 === split2 ? 'remained at ' + split1 : 'progressed from ' + split1 + ' to ' + split2)
             //+ ':\n - ' + IDs.slice(0, 3).join('\n - ') + (n > 3 ? '\n - and ' + (n - 3) + ' more' : '');
         });
     }
@@ -325,7 +333,7 @@ var interactiveSankey = function (webcharts) {
         chart.on('init', onInit);
         chart.on('layout', onLayout);
         chart.on('datatransform', onDataTransform);
-        chart.on('draw', onDraw);
+        chart.on('preprocess', onPreprocess);
         chart.on('resize', onResize);
 
         return chart;
@@ -333,4 +341,3 @@ var interactiveSankey = function (webcharts) {
 
     return interactiveSankey;
 }(webCharts);
-
