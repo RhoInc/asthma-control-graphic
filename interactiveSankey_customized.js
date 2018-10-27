@@ -165,6 +165,10 @@ var interactiveSankey = function (webcharts) {
     function onResize() {
         var context = this;
 
+        //make y axis text bigger
+        this.wrap.selectAll("g.axis").selectAll("g.tick").select("text").style("font-size","1.2em")
+        this.wrap.selectAll("g.axis").selectAll("text").style("font-size","1.2em")
+
         //Reset displays.
         this.wrap.selectAll('path.link').remove();
         this.wrap.selectAll('.barAnnotation').remove();
